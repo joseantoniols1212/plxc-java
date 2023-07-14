@@ -1,0 +1,76 @@
+import java_cup.runtime.*;
+
+terminal Integer ENTERO;
+terminal String IDENT;
+terminal String MAYOR, MENOR, IGUAL, DISTINTO, MAYORIGUAL, MENORIGUAL;
+terminal MAS, MENOS, UMENOS, POR, DIV, ASIG;
+terminal NOT, AND, OR;
+terminal IF, ELSE, DO, WHILE, FOR, PRINT;
+terminal AP, CP, ALL, CLL, PYC;
+
+non terminal syntax.BlockNode sentence_list;
+non terminal syntax.SentenceNode sentence;
+non terminal syntax.ExpressionNode expression;
+non terminal syntax.ConditionNode condition;
+non terminal syntax.BinaryOperation binary_operation;
+non terminal syntax.ComparisonNode comparison;
+non terminal syntax.Comparator comparator;
+non terminal syntax.AssignmentNode assignment;
+
+precedence left MENOS, MAS;
+precedence left OR;
+precedence left AND;
+precedence left IGUAL, DISTINTO;
+precedence left MENOR, MAYOR, MENORIGUAL, MAYORIGUAL;
+precedence left POR, DIV;
+precedence right UMENOS, NOT;
+
+precedence right ELSE;
+
+sentence_list ::= sentence:s                       {: RESULT = new syntax.BlockNode(); RESULT.add(s); :}
+                | sentence_list:l sentence:s       {: l.add(s); RESULT = l; :}
+                ;
+
+sentence ::= expression:e PYC                              {: RESULT = e; :}
+           | IF AP condition:c CP sentence:e {: RESULT = new syntax.IfNode(c, e, null); :}
+           | IF AP condition:c CP sentence:s1 ELSE sentence:s2 {: RESULT = new syntax.IfNode(c, s1, s2); :}
+           | WHILE AP condition:c CP sentence:s {: RESULT = new syntax.WhileNode(c, s); :}
+           | FOR AP expression:e1 PYC condition:c PYC expression:e2 CP sentence:s {: RESULT = new syntax.ForNode(e1, c, e2, s); :}
+           | DO sentence:s WHILE AP condition:c CP PYC {: RESULT = new syntax.DoWhileNode(c, s); :}
+           | PRINT AP expression:e CP PYC     {: RESULT = new syntax.FunctionNode("print", e); :}
+           | ALL sentence_list:s CLL  {: RESULT = s; :}
+           ;
+
+expression ::= ENTERO:e {: RESULT = new syntax.IntegerNode(e); :}
+             | assignment:a {: RESULT = a; :}
+             | IDENT:i  {: RESULT = new syntax.IdentifierNode(i); :}
+             | expression:e1 MAS expression:e2 {: RESULT = new syntax.BinaryExpressionNode(e1, e2, syntax.BinaryOperation.SUM); :}
+             | expression:e1 MENOS expression:e2 {: RESULT = new syntax.BinaryExpressionNode(e1, e2, syntax.BinaryOperation.DIFFERENCE); :}
+             | expression:e1 POR expression:e2{: RESULT = new syntax.BinaryExpressionNode(e1, e2, syntax.BinaryOperation.MULTIPLICATION); :}
+             | expression:e1 DIV expression:e2 {: RESULT = new syntax.BinaryExpressionNode(e1, e2, syntax.BinaryOperation.DIVISION); :}
+             | MENOS expression:e {: RESULT = new syntax.UnaryExpressionNode(e, syntax.UnaryOperation.MINUS); :}
+                %prec UMENOS
+             | AP expression:e CP {: RESULT = e; :}
+             ;
+
+assignment ::= IDENT:i ASIG expression:e {: RESULT = new syntax.AssignmentNode(new syntax.IdentifierNode(i), e); :}
+             ;
+
+
+condition ::= comparison:c {: RESULT = c; :}
+            | NOT condition:c {: c.not(); RESULT = c; :}
+            | condition:c1 AND condition:c2 {: RESULT = new syntax.BinaryConditionNode(c1, c2, syntax.BinaryLogicalOperator.AND); :}
+            | condition:c1 OR condition:c2 {: RESULT = new syntax.BinaryConditionNode(c1, c2, syntax.BinaryLogicalOperator.OR); :}
+            | AP condition:c CP {: RESULT = c; :}
+            ;
+
+comparison ::= expression:e1 comparator:c expression:e2 {: RESULT = new syntax.ComparisonNode(e1, e2, c); :}
+             ;
+
+comparator ::= MENOR {: RESULT = syntax.Comparator.LESS; :}
+             | MAYOR {: RESULT = syntax.Comparator.GREATER; :}
+             | MAYORIGUAL {: RESULT = syntax.Comparator.GREATER_EQUAL; :}
+             | MENORIGUAL {: RESULT = syntax.Comparator.LESS_EQUAL; :}
+             | IGUAL {: RESULT = syntax.Comparator.EQUAL; :}
+             | DISTINTO {: RESULT = syntax.Comparator.DISTINCT; :}
+             ;
