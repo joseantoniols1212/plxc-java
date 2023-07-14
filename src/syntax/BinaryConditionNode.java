@@ -31,16 +31,8 @@ public class BinaryConditionNode extends  ConditionNode {
         return operator;
     }
 
-    @Override
-    public Iterable<Node> getChildren() {
-        return Arrays.asList(left, right);
-    }
-
     public void not() {
-        this.operator = switch (this.getOperator()) {
-            case OR -> AND;
-            case AND -> OR;
-        };
+        this.operator = this.getOperator() == AND? OR : AND;
         this.left.not();
         this.right.not();
     }

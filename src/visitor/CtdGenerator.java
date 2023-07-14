@@ -71,36 +71,36 @@ public class CtdGenerator implements Visitor {
         node.getRight().accept(this);
         String right = lastVariable;
         switch (node.getComparator()) {
-            case EQUAL -> {
+            case EQUAL:
                 out.println("if ( " + left + " == " + right + " ) goto " + trueLabel + ";");
                 out.println("goto " + falseLabel + ";");
-            }
-            case GREATER_EQUAL -> {
+                break;
+            case GREATER_EQUAL:
                 out.println("if ( " + left + " < " + right + " ) goto " + falseLabel + ";");
                 out.println("goto " + trueLabel + ";");
-            }
-            case LESS -> {
+                break;
+            case LESS:
                 out.println("if ( " + left + " < " + right + " ) goto " + trueLabel + ";");
                 out.println("goto " + falseLabel + ";");
-            }
-            case DISTINCT -> {
+                break;
+            case DISTINCT:
                 out.println("if ( " + left + " == " + right + " ) goto " + falseLabel + ";");
                 out.println("goto " + trueLabel + ";");
-            }
-            case LESS_EQUAL -> {
+                break;
+            case LESS_EQUAL:
                 out.println("if ( " + right + " < " + left + " ) goto " + falseLabel + ";");
                 out.println("goto " + trueLabel + ";");
-            }
-            case GREATER -> {
+                break;
+            case GREATER:
                 out.println("if ( " + right + " < " + left + " ) goto " + trueLabel + ";");
                 out.println("goto " + falseLabel + ";");
-            }
+                break;
         }
     }
 
     @Override
     public void visit(BlockNode node) {
-        for(Node child : node.getChildren()) child.accept(this);
+        for(Node child : node.getSentences()) child.accept(this);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class CtdGenerator implements Visitor {
         out.println(trueLabel+":");
         node.getBody().accept(this);
         out.println("goto "+loopLabel+";");
-        out.println(falseLabel+":");
+        out.println(saveFalseLabel+":");
     }
 
     @Override
@@ -142,8 +142,6 @@ public class CtdGenerator implements Visitor {
 
     @Override
     public void visit(IfNode node) {
-        trueLabel = getLabel();
-        falseLabel = getLabel();
         node.getCondition().accept(this);
         out.println(trueLabel+":");
         String saveFalseLabel = falseLabel;
@@ -163,22 +161,22 @@ public class CtdGenerator implements Visitor {
     @Override
     public void visit(BinaryConditionNode node) {
         switch (node.getOperator()) {
-            case AND -> {
+            case AND:
                 node.getLeft().accept(this);
                 String leftFalse = falseLabel;
                 out.println(trueLabel+":");
                 node.getRight().accept(this);
                 out.println(leftFalse+":");
                 out.println("goto "+falseLabel+";");
-            }
-            case OR -> {
+                break;
+            case OR:
                 node.getLeft().accept(this);
                 String leftTrue = trueLabel;
                 out.println(falseLabel+":");
                 node.getRight().accept(this);
                 out.println(leftTrue+":");
                 out.println("goto "+trueLabel+";");
-            }
+                break;
         }
     }
 

@@ -23,9 +23,4 @@ public class BlockNode extends SentenceNode {
     public List<SentenceNode> getSentences(){
         return sentences;
     }
-
-    @Override
-    public Iterable<Node> getChildren() {
-        return new ArrayList<>(sentences);
-    }
 }

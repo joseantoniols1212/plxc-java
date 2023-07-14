@@ -15,9 +15,4 @@ public class IntegerNode extends ExpressionNode {
     public IntegerNode(Integer value) {
         this.value = value;
     }
-
-    @Override
-    public Iterable<Node> getChildren() {
-        return List.of();
-    }
 }

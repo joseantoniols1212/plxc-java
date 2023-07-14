@@ -6,27 +6,20 @@ public enum Comparator {
     @Override
     public String toString() {
         switch (this) {
-            case GREATER -> {
+            case GREATER:
                 return ">";
-            }
-            case LESS -> {
+            case LESS:
                 return "<";
-            }
-            case LESS_EQUAL -> {
+            case LESS_EQUAL:
                 return "<=";
-            }
-            case DISTINCT -> {
+            case DISTINCT:
                 return "!=";
-            }
-            case EQUAL -> {
+            case EQUAL:
                 return "==";
-            }
-            case GREATER_EQUAL -> {
+            case GREATER_EQUAL:
                 return ">=";
-            }
-            default -> {
+            default:
                 return null;
-            }
         }
     }
 }

@@ -20,14 +20,4 @@ public class UnaryExpressionNode extends ExpressionNode {
         this.node = node;
         this.operation = operation;
     }
-
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
-    }
-
-    @Override
-    public Iterable<Node> getChildren() {
-        return List.of(node);
-    }
 }

@@ -2,7 +2,12 @@ package visitor;
 
 import syntax.*;
 
+import java.io.PrintStream;
+
 public interface Visitor {
+
+    void changeOutput(PrintStream output);
+
     void visit(BinaryExpressionNode node);
     void visit(IntegerNode node);
     void visit(AssignmentNode node);

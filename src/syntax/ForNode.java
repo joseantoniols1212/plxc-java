@@ -31,9 +31,4 @@ public class ForNode extends SentenceNode {
     public SentenceNode getBody() {
         return body;
     }
-
-    @Override
-    public Iterable<Node> getChildren() {
-        return List.of(initialization, condition, increment, body);
-    }
 }

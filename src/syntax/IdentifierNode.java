@@ -16,9 +16,4 @@ public class IdentifierNode extends ExpressionNode {
     public IdentifierNode(String name) {
         this.name = name;
     }
-
-    @Override
-    public Iterable<Node> getChildren() {
-        return List.of();
-    }
 }

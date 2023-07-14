@@ -15,11 +15,6 @@ public class IfNode extends SentenceNode {
         this.else_body = else_body;
     }
 
-    @Override
-    public Iterable<Node> getChildren() {
-        return List.of(condition, body, else_body);
-    }
-
     public ConditionNode getCondition() {
         return condition;
     }

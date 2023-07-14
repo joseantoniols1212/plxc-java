@@ -19,6 +19,4 @@ public abstract class Node {
         else if (this instanceof ForNode) visitor.visit((ForNode) this);
         else throw new RuntimeException("Falta castear el nodo al aceptar visitor: "+this.getClass().getSimpleName());
     }
-
-    public abstract Iterable<Node> getChildren();
 }

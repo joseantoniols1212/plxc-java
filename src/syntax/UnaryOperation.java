@@ -7,15 +7,12 @@ public enum UnaryOperation {
     @Override
     public String toString() {
         switch (this) {
-            case PLUS -> {
+            case PLUS:
                 return "+";
-            }
-            case MINUS -> {
+            case MINUS:
                 return "-";
-            }
-            default -> {
+            default:
                 return null;
-            }
         }
     }
 }

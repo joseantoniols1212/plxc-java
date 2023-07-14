@@ -9,21 +9,16 @@ public enum BinaryOperation {
     @Override
     public String toString() {
         switch (this) {
-            case SUM -> {
+            case SUM:
                 return "+";
-            }
-            case DIVISION -> {
+            case DIVISION:
                 return "/";
-            }
-            case DIFFERENCE -> {
+            case DIFFERENCE:
                 return "-";
-            }
-            case MULTIPLICATION -> {
+            case MULTIPLICATION:
                 return "*";
-            }
-            default -> {
+            default:
                 return null;
-            }
         }
     }
 }

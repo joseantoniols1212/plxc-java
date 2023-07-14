@@ -15,11 +15,6 @@ public class WhileNode extends SentenceNode {
         return body;
     }
 
-    @Override
-    public Iterable<Node> getChildren() {
-        return Arrays.asList(condition, body);
-    }
-
     public WhileNode(ConditionNode condition, SentenceNode body) {
         this.condition = condition;
         this.body = body;

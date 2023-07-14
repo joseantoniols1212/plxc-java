@@ -26,9 +26,4 @@ public class BinaryExpressionNode extends ExpressionNode {
         this.right = right;
         this.operation = operation;
     }
-
-    @Override
-    public Iterable<Node> getChildren() {
-        return Arrays.asList(left, right);
-    }
 }

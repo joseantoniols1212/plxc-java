@@ -19,9 +19,4 @@ public class AssignmentNode extends ExpressionNode {
         this.identifier = identifier;
         this.assignment = assignment;
     }
-
-    @Override
-    public Iterable<Node> getChildren() {
-        return Arrays.asList(identifier, assignment);
-    }
 }

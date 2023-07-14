@@ -6,15 +6,12 @@ public enum BinaryLogicalOperator {
     @Override
     public String toString() {
         switch (this) {
-            case OR -> {
+            case OR:
                 return "||";
-            }
-            case AND -> {
+            case AND:
                 return "&&";
-            }
-            default -> {
+            default:
                 return null;
-            }
         }
     }
 }

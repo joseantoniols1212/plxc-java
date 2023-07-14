@@ -29,19 +29,26 @@ public class ComparisonNode extends ConditionNode {
     }
 
     @Override
-    public Iterable<Node> getChildren() {
-        return Arrays.asList(left, right);
-    }
-
-    @Override
     public void not() {
-        this.comparator = switch (this.comparator) {
-            case LESS -> Comparator.GREATER_EQUAL;
-            case EQUAL -> Comparator.DISTINCT;
-            case GREATER -> Comparator.LESS_EQUAL;
-            case DISTINCT -> Comparator.EQUAL;
-            case LESS_EQUAL -> Comparator.GREATER;
-            case GREATER_EQUAL -> Comparator.LESS;
+        switch (this.comparator) {
+            case LESS:
+                this.comparator = Comparator.GREATER_EQUAL;
+                break;
+            case EQUAL:
+                this.comparator = Comparator.DISTINCT;
+                break;
+            case GREATER:
+                this.comparator = Comparator.LESS_EQUAL;
+                break;
+            case DISTINCT:
+                this.comparator = Comparator.EQUAL;
+                break;
+            case LESS_EQUAL:
+                this.comparator = Comparator.GREATER;
+                break;
+            case GREATER_EQUAL:
+                this.comparator = Comparator.LESS;
+                break;
         };
     }
 }
