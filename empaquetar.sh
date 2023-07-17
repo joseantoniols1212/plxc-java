@@ -1,6 +1,6 @@
 #!/bin/bash
 
-name="PLC"
+name="PLXC"
 
 cd ./src/
 zip ../$name.zip ./$name.* ./visitor/* ./syntax/*

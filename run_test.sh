@@ -1,6 +1,6 @@
 #!/bin/bash
 
-name="PLC"
+name="PLXC"
 cup="java -jar $HOME/Desarrollo/plxc-java/LibreriaCup/java-cup-11b.jar"
 jflex="$HOME/.local/bin/jflex"
 
@@ -15,7 +15,7 @@ javac -cp ../../LibreriaCup/java-cup-11b-runtime.jar: *.java
 for i in ../tests/*
 do
   echo $i
-  diff <(../ctd <(../plc $i)) <(../ctd <(java -cp ../../LibreriaCup/java-cup-11b-runtime.jar: PLC $i))
+  diff <(../ctd <(../plxc $i)) <(../ctd <(java -cp ../../LibreriaCup/java-cup-11b-runtime.jar: PLC $i))
 done
 
 # Borramos archivos compilados

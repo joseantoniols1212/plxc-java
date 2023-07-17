@@ -1,6 +1,6 @@
 #!/bin/bash
 
-name="PLC"
+name="PLXC"
 cup="java -jar $HOME/Desarrollo/plxc-java/LibreriaCup/java-cup-11b.jar"
 jflex="$HOME/.local/bin/jflex"
 

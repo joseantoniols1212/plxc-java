@@ -5,7 +5,7 @@ import visitor.Visitor;
 
 import java.io.*;
 
-public class PLC {	   
+public class PLXC {
 	public static void main(String[] argv) {
     try {
         Reader in = new InputStreamReader(System.in);
