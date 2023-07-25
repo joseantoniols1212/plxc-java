@@ -2,7 +2,11 @@ package syntax;
 
 public enum UnaryOperation {
     PLUS,
-    MINUS;
+    MINUS,
+    PREINC,
+    POSTINC,
+    PREDEC,
+    POSTDEC;
 
     @Override
     public String toString() {
@@ -11,6 +15,14 @@ public enum UnaryOperation {
                 return "+";
             case MINUS:
                 return "-";
+            case PREDEC:
+                return "PREDEC";
+            case POSTDEC:
+                return "POSTDEC";
+            case PREINC:
+                return "PREINC";
+            case POSTINC:
+                return "POSTINC";
             default:
                 return null;
         }

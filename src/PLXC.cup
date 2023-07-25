@@ -3,28 +3,31 @@ import java_cup.runtime.*;
 terminal Integer ENTERO;
 terminal String IDENT;
 terminal String MAYOR, MENOR, IGUAL, DISTINTO, MAYORIGUAL, MENORIGUAL;
-terminal MAS, MENOS, UMENOS, POR, DIV, ASIG;
+terminal MAS, MENOS, UMENOS, POR, DIV, ASIG, MODULO, PLUSPLUS, MINUSMINUS;
 terminal NOT, AND, OR;
-terminal IF, ELSE, DO, WHILE, FOR, PRINT;
+terminal IF, ELSE, DO, WHILE, FOR, PRINT, TO, DOWNTO, STEP;
 terminal AP, CP, ALL, CLL, PYC;
+terminal INT, COMA;
+terminal POSTINC, POSTDEC, PREINC, PREDEC;
 
 non terminal syntax.BlockNode sentence_list;
 non terminal syntax.SentenceNode sentence;
-non terminal syntax.ExpressionNode expression;
+non terminal syntax.ExpressionNode expression, increment;
 non terminal syntax.ConditionNode condition;
-non terminal syntax.BinaryOperation binary_operation;
 non terminal syntax.ComparisonNode comparison;
 non terminal syntax.Comparator comparator;
 non terminal syntax.AssignmentNode assignment;
+non terminal syntax.DeclarationNode declaration, variable_list;
+non terminal syntax.IdentifierNode identifier;
 
 precedence left MENOS, MAS;
 precedence left OR;
 precedence left AND;
 precedence left IGUAL, DISTINTO;
 precedence left MENOR, MAYOR, MENORIGUAL, MAYORIGUAL;
-precedence left POR, DIV;
-precedence right UMENOS, NOT;
-
+precedence left POR, DIV, MODULO;
+precedence right UMENOS, NOT, PREDEC, PREINC;
+precedence left POSTINC, POSTDEC;
 precedence right ELSE;
 
 sentence_list ::= sentence:s                       {: RESULT = new syntax.BlockNode(); RESULT.add(s); :}
@@ -32,25 +35,62 @@ sentence_list ::= sentence:s                       {: RESULT = new syntax.BlockN
                 ;
 
 sentence ::= expression:e PYC                              {: RESULT = e; :}
+           | declaration:d PYC                             {: RESULT = d; :}
            | IF AP condition:c CP sentence:e {: RESULT = new syntax.IfNode(c, e, null); :}
            | IF AP condition:c CP sentence:s1 ELSE sentence:s2 {: RESULT = new syntax.IfNode(c, s1, s2); :}
            | WHILE AP condition:c CP sentence:s {: RESULT = new syntax.WhileNode(c, s); :}
            | FOR AP expression:e1 PYC condition:c PYC expression:e2 CP sentence:s {: RESULT = new syntax.ForNode(e1, c, e2, s); :}
+           | FOR assignment:a TO expression:e DO sentence:s {: RESULT = new syntax.ForToNode(a, e, s); :}
+           | FOR assignment:a DOWNTO expression:e DO sentence:s  {: RESULT = new syntax.ForDownToNode(a, e, s); :}
+           | FOR assignment:a TO expression:e STEP expression:step DO sentence:s {: RESULT = new syntax.ForToNode(a, e, step, s);:}
+           | FOR assignment:a DOWNTO expression:e STEP expression:step DO sentence:s  {: RESULT = new syntax.ForDownToNode(a, e, step, s); :}
            | DO sentence:s WHILE AP condition:c CP PYC {: RESULT = new syntax.DoWhileNode(c, s); :}
            | PRINT AP expression:e CP PYC     {: RESULT = new syntax.FunctionNode("print", e); :}
            | ALL sentence_list:s CLL  {: RESULT = s; :}
            ;
 
+declaration ::= INT variable_list:l  {: RESULT = l; l.setType("INT"); :}
+              ;
+
+variable_list ::= variable_list:l COMA IDENT:i      {: l.add(new syntax.IdentifierNode(i)); RESULT = l; :}
+                | variable_list:l COMA assignment:a {: l.add(a); RESULT = l; :}
+                | assignment:a                      {: RESULT = new syntax.DeclarationNode(); RESULT.add(a); :}
+                | IDENT:i                           {: RESULT = new syntax.DeclarationNode(); RESULT.add(new syntax.IdentifierNode(i)); :}
+                ;
+
 expression ::= ENTERO:e {: RESULT = new syntax.IntegerNode(e); :}
              | assignment:a {: RESULT = a; :}
-             | IDENT:i  {: RESULT = new syntax.IdentifierNode(i); :}
+             | increment:i {: RESULT = i; :}
              | expression:e1 MAS expression:e2 {: RESULT = new syntax.BinaryExpressionNode(e1, e2, syntax.BinaryOperation.SUM); :}
              | expression:e1 MENOS expression:e2 {: RESULT = new syntax.BinaryExpressionNode(e1, e2, syntax.BinaryOperation.DIFFERENCE); :}
              | expression:e1 POR expression:e2{: RESULT = new syntax.BinaryExpressionNode(e1, e2, syntax.BinaryOperation.MULTIPLICATION); :}
              | expression:e1 DIV expression:e2 {: RESULT = new syntax.BinaryExpressionNode(e1, e2, syntax.BinaryOperation.DIVISION); :}
+             | expression:e1 MODULO expression:e2 {: RESULT = new syntax.BinaryExpressionNode(e1, e2, syntax.BinaryOperation.MOD); :}
              | MENOS expression:e {: RESULT = new syntax.UnaryExpressionNode(e, syntax.UnaryOperation.MINUS); :}
                 %prec UMENOS
              | AP expression:e CP {: RESULT = e; :}
+             | identifier:i {: RESULT = i; :}
+             ;
+
+increment ::= PLUSPLUS identifier:e {: RESULT = new syntax.UnaryExpressionNode(e, syntax.UnaryOperation.PREINC); :}
+                %prec PREINC
+             | MINUSMINUS identifier:e {: RESULT = new syntax.UnaryExpressionNode(e, syntax.UnaryOperation.PREDEC); :}
+                %prec PREDEC
+             | identifier:e PLUSPLUS {: RESULT = new syntax.UnaryExpressionNode(e, syntax.UnaryOperation.POSTINC); :}
+                %prec POSTINC
+             | identifier:e MINUSMINUS {: RESULT = new syntax.UnaryExpressionNode(e, syntax.UnaryOperation.POSTDEC); :}
+                %prec POSTDEC
+             | PLUSPLUS AP expression:e CP {: RESULT = new syntax.UnaryExpressionNode(e, syntax.UnaryOperation.PREINC); :}
+                %prec PREINC
+             | MINUSMINUS AP expression:e CP {: RESULT = new syntax.UnaryExpressionNode(e, syntax.UnaryOperation.PREDEC); :}
+                %prec PREDEC
+             | AP expression:e CP PLUSPLUS {: RESULT = new syntax.UnaryExpressionNode(e, syntax.UnaryOperation.POSTINC); :}
+                %prec POSTINC
+             | AP expression:e CP MINUSMINUS {: RESULT = new syntax.UnaryExpressionNode(e, syntax.UnaryOperation.POSTDEC); :}
+                %prec POSTDEC
+             ;
+
+identifier ::= IDENT:i  {: RESULT = new syntax.IdentifierNode(i); :}
              ;
 
 assignment ::= IDENT:i ASIG expression:e {: RESULT = new syntax.AssignmentNode(new syntax.IdentifierNode(i), e); :}

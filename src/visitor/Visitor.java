@@ -21,5 +21,8 @@ public interface Visitor {
     void visit(WhileNode node);
     void visit(DoWhileNode node);
     void visit(ForNode node);
+    void visit(DeclarationNode node);
+    void visit(ForToNode node);
+    void visit(ForDownToNode node);
 }
 

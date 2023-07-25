@@ -14,5 +14,6 @@ public class IntegerNode extends ExpressionNode {
 
     public IntegerNode(Integer value) {
         this.value = value;
+        super.setType("INT");
     }
 }

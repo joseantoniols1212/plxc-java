@@ -1,5 +1,7 @@
 package visitor;
 
+import symbolTable.Register;
+import symbolTable.SymbolTable;
 import syntax.*;
 
 import java.io.PrintStream;
@@ -14,6 +16,8 @@ public class CtdGenerator implements Visitor {
     private String falseLabel = null;
 
     private PrintStream out = System.out;
+
+    private SymbolTable symbolTable = new SymbolTable();
 
     public void changeOutput(PrintStream output) {
         this.out = output;
@@ -34,7 +38,16 @@ public class CtdGenerator implements Visitor {
         String left = lastVariable;
         node.getRight().accept(this);
         String right = lastVariable;
-        out.println(var + " = " + left + " " + node.getOperation().toString() + " " + right + ";");
+        BinaryOperation operation = node.getOperation();
+        if (operation.equals(BinaryOperation.MOD)) {
+            String divVariable = getVar();
+            String prodVariable = getVar();
+            out.println(divVariable + " = " + left + "/" + right + ";");
+            out.println(prodVariable + " = " + divVariable + "*" + right + ";");
+            out.println(var + " = " + left + "-" + prodVariable + ";");
+        } else {
+            out.println(var + " = " + left + " " + node.getOperation().toString() + " " + right + ";");
+        }
         lastVariable = var;
     }
 
@@ -48,7 +61,9 @@ public class CtdGenerator implements Visitor {
     @Override
     public void visit(AssignmentNode node) {
         node.getAssignment().accept(this);
-        out.println(node.getIdentifier().getName()+" = "+lastVariable + ";");
+        String assignmentVariable = lastVariable;
+        node.getIdentifier().accept(this);
+        out.println(lastVariable+" = "+assignmentVariable + ";");
     }
 
     @Override
@@ -59,7 +74,12 @@ public class CtdGenerator implements Visitor {
 
     @Override
     public void visit(IdentifierNode node) {
-        lastVariable = node.getName();
+        int identifierBlock = symbolTable.search(new Register(node.getIdentifierName(), "INT"));
+        if ( identifierBlock == -1) {
+            out.println("error;");
+            out.println("# Variable no declarada; ");
+        }
+        lastVariable = node.getIdentifierName() + "_" + identifierBlock;
     }
 
     @Override
@@ -100,7 +120,9 @@ public class CtdGenerator implements Visitor {
 
     @Override
     public void visit(BlockNode node) {
+        symbolTable.openBlock();
         for(Node child : node.getSentences()) child.accept(this);
+        symbolTable.closeBlock();
     }
 
     @Override
@@ -138,6 +160,60 @@ public class CtdGenerator implements Visitor {
         node.getIncrement().accept(this);
         out.println("goto "+loopLabel+";");
         out.println(saveFalseLabel+":");
+    }
+
+    @Override
+    public void visit(DeclarationNode node) {
+        for (VariableNode variable : node.getVariables()) {
+            Register register = new Register(variable.getIdentifierName(), node.getType());
+            if ( symbolTable.insert(register) == -1 ) {
+                out.println("error;");
+                out.println("# Variable ya declarada ");
+            }
+            variable.accept(this);
+        }
+    }
+
+    @Override
+    public void visit(ForToNode node) {
+        node.getInitialization().accept(this);
+        String var = lastVariable;
+        node.getBound().accept(this);
+        String bound = lastVariable;
+        String loopLabel = getLabel();
+        String goBody = getLabel();
+        String exitLoop = getLabel();
+        out.println(loopLabel+":");
+        out.println("if ( " + bound + " < " + var + " ) goto " + exitLoop + ";");
+        out.println("goto " + goBody + ";");
+        out.println(goBody+":");
+        node.getBody().accept(this);
+        node.getStep().accept(this);
+        String step = lastVariable;
+        out.println(var+ " = " + var + " + " + step + ";");
+        out.println("goto "+loopLabel+";");
+        out.println(exitLoop+":");
+    }
+
+    @Override
+    public void visit(ForDownToNode node) {
+        node.getInitialization().accept(this);
+        String var = lastVariable;
+        node.getBound().accept(this);
+        String bound = lastVariable;
+        String loopLabel = getLabel();
+        String goBody = getLabel();
+        String exitLoop = getLabel();
+        out.println(loopLabel+":");
+        out.println("if ( " + var + " < " + bound + " ) goto " + exitLoop + ";");
+        out.println("goto " + goBody + ";");
+        out.println(goBody+":");
+        node.getBody().accept(this);
+        node.getStep().accept(this);
+        String step = lastVariable;
+        out.println(var+ " = " + var + " - " + step + ";");
+        out.println("goto "+loopLabel+";");
+        out.println(exitLoop+":");
     }
 
     @Override
@@ -184,7 +260,37 @@ public class CtdGenerator implements Visitor {
     public void visit(UnaryExpressionNode node) {
         String var = getVar();
         node.getNode().accept(this);
-        out.println(var+" = "+ node.getOperation().toString() +lastVariable + ";");
-        lastVariable = var;
+        switch (node.getOperation()) {
+            case MINUS:
+                out.println(var+" = "+ node.getOperation().toString() +lastVariable + ";");
+                lastVariable = var;
+                break;
+            case PREDEC:
+                errorNotIdentifier(node.getNode());
+                out.println(lastVariable+" = "+lastVariable + "- 1 ;");
+                break;
+            case PREINC:
+                errorNotIdentifier(node.getNode());
+                out.println(lastVariable+" = "+lastVariable + "+ 1 ;");
+                break;
+            case POSTDEC:
+                errorNotIdentifier(node.getNode());
+                out.println(var+" = "+lastVariable + ";");
+                out.println(lastVariable+" = "+lastVariable + "- 1 ;");
+                lastVariable = var;
+                break;
+            case POSTINC:
+                errorNotIdentifier(node.getNode());
+                out.println(var+" = "+lastVariable + ";");
+                out.println(lastVariable+" = "+lastVariable + "+ 1 ;");
+                lastVariable = var;
+                break;
+        }
+    }
+
+    public void errorNotIdentifier(Node node) {
+        if (!node.getClass().getSimpleName().equals("IdentifierNode")) {
+            out.println("error;");
+        }
     }
 }

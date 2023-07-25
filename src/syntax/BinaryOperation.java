@@ -4,7 +4,8 @@ public enum BinaryOperation {
     SUM,
     MULTIPLICATION,
     DIVISION,
-    DIFFERENCE;
+    DIFFERENCE,
+    MOD;
 
     @Override
     public String toString() {
@@ -17,6 +18,8 @@ public enum BinaryOperation {
                 return "-";
             case MULTIPLICATION:
                 return "*";
+            case MOD:
+                return "%";
             default:
                 return null;
         }

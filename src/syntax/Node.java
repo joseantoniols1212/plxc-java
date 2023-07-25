@@ -17,6 +17,9 @@ public abstract class Node {
         else if (this instanceof WhileNode) visitor.visit((WhileNode) this);
         else if (this instanceof DoWhileNode) visitor.visit((DoWhileNode) this);
         else if (this instanceof ForNode) visitor.visit((ForNode) this);
+        else if (this instanceof DeclarationNode) visitor.visit((DeclarationNode) this);
+        else if (this instanceof ForToNode) visitor.visit((ForToNode) this);
+        else if (this instanceof ForDownToNode) visitor.visit((ForDownToNode) this);
         else throw new RuntimeException("Falta castear el nodo al aceptar visitor: "+this.getClass().getSimpleName());
     }
 }

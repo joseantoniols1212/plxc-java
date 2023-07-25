@@ -3,7 +3,6 @@ package visitor;
 import syntax.*;
 
 import java.io.PrintStream;
-import java.util.Iterator;
 import java.util.List;
 
 public class PrettyPrint implements Visitor {
@@ -58,7 +57,7 @@ public class PrettyPrint implements Visitor {
 
     @Override
     public void visit(IdentifierNode node) {
-        print(node.getName());
+        print(node.getIdentifierName());
     }
 
     @Override
@@ -147,6 +146,47 @@ public class PrettyPrint implements Visitor {
         node.getCondition().accept(this);
         indent = saveIndent;
         node.getIncrement().accept(this);
+        indent = saveIndent;
+        isLast = true;
+        node.getBody().accept(this);
+    }
+
+    @Override
+    public void visit(DeclarationNode node) {
+        print(node.getType());
+        String saveIndent = indent;
+        List<VariableNode> identifiers = node.getVariables();
+        for (int i = 0; i< identifiers.size(); i++){
+            if (i == identifiers.size()-1)
+                isLast = true;
+            identifiers.get(i).accept(this);
+            indent = saveIndent;
+        }
+    }
+
+    @Override
+    public void visit(ForToNode node) {
+        print("For To");
+        String saveIndent = indent;
+        node.getInitialization().accept(this);
+        indent = saveIndent;
+        node.getBound().accept(this);
+        indent = saveIndent;
+        node.getStep().accept(this);
+        indent = saveIndent;
+        isLast = true;
+        node.getBody().accept(this);
+    }
+
+    @Override
+    public void visit(ForDownToNode node) {
+        print("For Down To");
+        String saveIndent = indent;
+        node.getInitialization().accept(this);
+        indent = saveIndent;
+        node.getBound().accept(this);
+        indent = saveIndent;
+        node.getStep().accept(this);
         indent = saveIndent;
         isLast = true;
         node.getBody().accept(this);

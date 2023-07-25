@@ -1,19 +1,14 @@
 package syntax;
 
-import visitor.Visitor;
+public class IdentifierNode extends VariableNode {
 
-import java.util.Arrays;
-import java.util.List;
+    private String identifierName;
 
-public class IdentifierNode extends ExpressionNode {
-
-    private String name;
-
-    public String getName() {
-        return this.name;
+    public String getIdentifierName() {
+        return this.identifierName;
     }
 
     public IdentifierNode(String name) {
-        this.name = name;
+        this.identifierName = name;
     }
 }
